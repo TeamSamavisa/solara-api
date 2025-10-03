@@ -1,0 +1,103 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateSubjectTeacherDto } from './dto/create-subject-teacher.dto';
+import { UpdateSubjectTeacherDto } from './dto/update-subject-teacher.dto';
+import { SubjectTeacher } from './entities/subject-teacher.entity';
+import { InjectModel } from '@nestjs/sequelize';
+import { GetSubjectTeachersQueryDto } from './dto/get-subject-teachers.dto';
+import { buildWhere } from 'src/utils/build-where';
+
+@Injectable()
+export class SubjectTeacherService {
+  constructor(
+    @InjectModel(SubjectTeacher)
+    private readonly subjectModel: typeof SubjectTeacher,
+  ) {}
+
+  async create(createSubjectTeacherDto: CreateSubjectTeacherDto) {
+    const subjectTeacherData = {
+      subject_id: createSubjectTeacherDto.subject_id,
+      teacher_id: createSubjectTeacherDto.teacher_id,
+    };
+
+    const subjectTeacher = await this.subjectModel.create(subjectTeacherData);
+    return subjectTeacher.get();
+  }
+
+  async list(query: GetSubjectTeachersQueryDto) {
+    const { limit, offset, page, ...filter } = query;
+
+    const result = await SubjectTeacher.findAndCountAll({
+      where: buildWhere(filter),
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      include: ['subject', 'teacher'],
+    });
+
+    const totalItems = result.count;
+    const totalPages = Math.ceil(totalItems / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return {
+      content: result.rows.map((row) => row.toJSON()),
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems,
+        itemsPerPage: limit,
+        hasNextPage,
+        hasPrevPage,
+      },
+    };
+  }
+
+  async getById(id: number) {
+    const subjectTeacher = await SubjectTeacher.findByPk(id, {
+      include: ['subject', 'teacher'],
+    });
+
+    if (!subjectTeacher) {
+      throw new NotFoundException(
+        'Association between teacher and subject not found',
+      );
+    }
+
+    return subjectTeacher;
+  }
+
+  async update(id: number, updateSubjectTeacherDto: UpdateSubjectTeacherDto) {
+    const subjectTeacher = await this.ensureRecordExists(id);
+
+    const updateData: UpdateSubjectTeacherDto = {};
+
+    if (updateSubjectTeacherDto.subject_id !== undefined) {
+      updateData.subject_id = updateSubjectTeacherDto.subject_id;
+    }
+
+    if (updateSubjectTeacherDto.teacher_id !== undefined) {
+      updateData.teacher_id = updateSubjectTeacherDto.teacher_id;
+    }
+
+    await subjectTeacher.update(updateData);
+    return subjectTeacher.get();
+  }
+
+  async remove(id: number) {
+    const subjectTeacher = await this.ensureRecordExists(id);
+    await subjectTeacher.destroy();
+    return subjectTeacher;
+  }
+
+  private async ensureRecordExists(id: number): Promise<SubjectTeacher> {
+    const subjectTeacher = await this.subjectModel.findByPk(id);
+
+    if (!subjectTeacher) {
+      throw new NotFoundException(
+        'Association between teacher and subject not found',
+      );
+    }
+
+    return subjectTeacher;
+  }
+}
