@@ -19,7 +19,9 @@ export class UserService {
     private readonly userModel: typeof User,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<Omit<User, 'password_hash'>> {
     const existingEmail = await User.findOne({
       where: { email: createUserDto.email },
     });
@@ -82,7 +84,10 @@ export class UserService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<Omit<User, 'password_hash'>> {
     const user = await this.ensureRecordExists(id);
 
     if (
@@ -131,8 +136,9 @@ export class UserService {
     return user;
   }
 
-  private sanitizeUserResponse(user: User) {
-    const { password_hash, ...result } = user.get();
-    return result;
+  private sanitizeUserResponse(user: User): Omit<User, 'password_hash'> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password_hash, ...result } = user.get() as User;
+    return result as Omit<User, 'password_hash'>;
   }
 }

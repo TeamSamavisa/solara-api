@@ -13,7 +13,7 @@ export class ScheduleService {
     private readonly scheduleModel: typeof Schedule,
   ) {}
 
-  async create(createScheduleDto: CreateScheduleDto) {
+  async create(createScheduleDto: CreateScheduleDto): Promise<Schedule> {
     const scheduleData = {
       weekday: createScheduleDto.weekday,
       start_time: createScheduleDto.start_time,
@@ -21,7 +21,7 @@ export class ScheduleService {
     };
 
     const schedule = await this.scheduleModel.create(scheduleData);
-    return schedule.get();
+    return schedule.get() as Schedule;
   }
 
   async list(query: GetSchedulesQueryDto) {
@@ -57,7 +57,10 @@ export class ScheduleService {
     return schedule;
   }
 
-  async update(id: number, updateScheduleDto: UpdateScheduleDto) {
+  async update(
+    id: number,
+    updateScheduleDto: UpdateScheduleDto,
+  ): Promise<Schedule> {
     const schedule = await this.ensureRecordExists(id);
 
     const updateData: UpdateScheduleDto = {};
@@ -75,7 +78,7 @@ export class ScheduleService {
     }
 
     await schedule.update(updateData);
-    return schedule.get();
+    return schedule.get() as Schedule;
   }
 
   async remove(id: number) {

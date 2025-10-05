@@ -13,13 +13,13 @@ export class ShiftService {
     private readonly shiftModel: typeof Shift,
   ) {}
 
-  async create(createShiftDto: CreateShiftDto) {
+  async create(createShiftDto: CreateShiftDto): Promise<Shift> {
     const shiftData = {
       name: createShiftDto.name,
     };
 
     const shift = await this.shiftModel.create(shiftData);
-    return shift.get();
+    return shift.get() as Shift;
   }
 
   async list(query: GetShiftsQueryDto) {
@@ -55,7 +55,7 @@ export class ShiftService {
     return shift;
   }
 
-  async update(id: number, updateShiftDto: UpdateShiftDto) {
+  async update(id: number, updateShiftDto: UpdateShiftDto): Promise<Shift> {
     const shift = await this.ensureRecordExists(id);
 
     const updateData: UpdateShiftDto = {};
@@ -65,7 +65,7 @@ export class ShiftService {
     }
 
     await shift.update(updateData);
-    return shift.get();
+    return shift.get() as Shift;
   }
 
   async remove(id: number) {

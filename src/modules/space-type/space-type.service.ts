@@ -13,13 +13,13 @@ export class SpaceTypeService {
     private readonly spaceTypeModel: typeof SpaceType,
   ) {}
 
-  async create(createSpaceTypeDto: CreateSpaceTypeDto) {
+  async create(createSpaceTypeDto: CreateSpaceTypeDto): Promise<SpaceType> {
     const spaceTypeData = {
       name: createSpaceTypeDto.name,
     };
 
     const spaceType = await this.spaceTypeModel.create(spaceTypeData);
-    return spaceType.get();
+    return spaceType.get() as SpaceType;
   }
 
   async list(query: GetSpaceTypesQueryDto) {
@@ -55,7 +55,10 @@ export class SpaceTypeService {
     return spaceType;
   }
 
-  async update(id: number, updateSpaceTypeDto: UpdateSpaceTypeDto) {
+  async update(
+    id: number,
+    updateSpaceTypeDto: UpdateSpaceTypeDto,
+  ): Promise<SpaceType> {
     const spaceType = await this.ensureRecordExists(id);
 
     const updateData: UpdateSpaceTypeDto = {};
@@ -65,7 +68,7 @@ export class SpaceTypeService {
     }
 
     await spaceType.update(updateData);
-    return spaceType.get();
+    return spaceType.get() as SpaceType;
   }
 
   async remove(id: number) {

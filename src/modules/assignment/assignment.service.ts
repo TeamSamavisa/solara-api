@@ -5,6 +5,7 @@ import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 import { Assignment } from './entities/assignment.entity';
 import { GetAssignmentsQueryDto } from './dto/get-assignments.dto';
 import { buildWhere } from 'src/utils/build-where';
+import { PaginatedResponse } from 'src/utils/types/paginated-response';
 
 @Injectable()
 export class AssignmentService {
@@ -13,7 +14,7 @@ export class AssignmentService {
     private readonly assignmentModel: typeof Assignment,
   ) {}
 
-  async create(createAssignmentDto: CreateAssignmentDto) {
+  async create(createAssignmentDto: CreateAssignmentDto): Promise<Assignment> {
     const assignmentData = {
       schedule_id: createAssignmentDto.schedule_id,
       teacher_id: createAssignmentDto.teacher_id,
@@ -23,10 +24,12 @@ export class AssignmentService {
     };
 
     const assignment = await this.assignmentModel.create(assignmentData);
-    return assignment.get();
+    return assignment.get() as Assignment;
   }
 
-  async list(query: GetAssignmentsQueryDto) {
+  async list(
+    query: GetAssignmentsQueryDto,
+  ): Promise<PaginatedResponse<Assignment>> {
     const { limit, offset, page, ...filter } = query;
 
     const result = await this.assignmentModel.findAndCountAll({
@@ -67,7 +70,10 @@ export class AssignmentService {
     return assignment;
   }
 
-  async update(id: number, updateAssignmentDto: UpdateAssignmentDto) {
+  async update(
+    id: number,
+    updateAssignmentDto: UpdateAssignmentDto,
+  ): Promise<Assignment> {
     const assignment = await this.ensureRecordExists(id);
 
     const updateData: UpdateAssignmentDto = {};
@@ -93,7 +99,7 @@ export class AssignmentService {
     }
 
     await assignment.update(updateData);
-    return assignment.get();
+    return assignment.get() as Assignment;
   }
 
   async remove(id: number) {

@@ -5,6 +5,7 @@ import { ScheduleTeacher } from './entities/schedule-teacher.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { GetScheduleTeachersQueryDto } from './dto/get-schedule-teachers.dto';
 import { buildWhere } from 'src/utils/build-where';
+import { PaginatedResponse } from 'src/utils/types/paginated-response';
 
 @Injectable()
 export class ScheduleTeacherService {
@@ -13,7 +14,9 @@ export class ScheduleTeacherService {
     private readonly scheduleTeacherModel: typeof ScheduleTeacher,
   ) {}
 
-  async create(createScheduleTeacherDto: CreateScheduleTeacherDto) {
+  async create(
+    createScheduleTeacherDto: CreateScheduleTeacherDto,
+  ): Promise<ScheduleTeacher> {
     const scheduleTeacherData = {
       schedule_id: createScheduleTeacherDto.schedule_id,
       teacher_id: createScheduleTeacherDto.teacher_id,
@@ -21,10 +24,12 @@ export class ScheduleTeacherService {
 
     const scheduleTeacher =
       await this.scheduleTeacherModel.create(scheduleTeacherData);
-    return scheduleTeacher.get();
+    return scheduleTeacher.get() as ScheduleTeacher;
   }
 
-  async list(query: GetScheduleTeachersQueryDto) {
+  async list(
+    query: GetScheduleTeachersQueryDto,
+  ): Promise<PaginatedResponse<ScheduleTeacher>> {
     const { limit, offset, page, ...filter } = query;
 
     const result = await this.scheduleTeacherModel.findAndCountAll({
@@ -67,7 +72,10 @@ export class ScheduleTeacherService {
     return scheduleTeacher;
   }
 
-  async update(id: number, updateScheduleTeacherDto: UpdateScheduleTeacherDto) {
+  async update(
+    id: number,
+    updateScheduleTeacherDto: UpdateScheduleTeacherDto,
+  ): Promise<ScheduleTeacher> {
     const scheduleTeacher = await this.ensureRecordExists(id);
 
     const updateData: UpdateScheduleTeacherDto = {};
@@ -81,7 +89,7 @@ export class ScheduleTeacherService {
     }
 
     await scheduleTeacher.update(updateData);
-    return scheduleTeacher.get();
+    return scheduleTeacher.get() as ScheduleTeacher;
   }
 
   async remove(id: number) {

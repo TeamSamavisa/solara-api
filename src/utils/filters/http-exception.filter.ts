@@ -7,7 +7,24 @@ import {
   Logger,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { Response } from 'express';
+import { Request, Response } from 'express';
+
+interface Violation {
+  field: string;
+  message: string;
+}
+
+interface HttpExceptionResponse {
+  message: string | string[];
+  violations?: Violation[];
+  statusCode?: number;
+}
+
+interface RequestWithUser extends Request {
+  user?: {
+    id: string;
+  };
+}
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -16,7 +33,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest();
+    const request = ctx.getRequest<RequestWithUser>();
     const isProduction = process.env.NODE_ENV === 'production';
     const requestId = randomUUID();
 
@@ -27,13 +44,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
     try {
       if (exception instanceof HttpException) {
         status = exception.getStatus();
-        const exceptionResponse = exception.getResponse() as any;
+        const exceptionResponse =
+          exception.getResponse() as HttpExceptionResponse;
 
         if (isProduction) {
           if (status === HttpStatus.CONFLICT) {
             message = 'Validation error';
             errors =
-              exceptionResponse.violations?.map((v: any) => ({
+              exceptionResponse.violations?.map((v) => ({
                 field: v.field,
                 message: 'Invalid value',
               })) || [];
@@ -41,12 +59,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
             message = 'An error occurred';
           }
         } else {
-          message = exceptionResponse.message;
+          message = Array.isArray(exceptionResponse.message)
+            ? exceptionResponse.message.join(', ')
+            : exceptionResponse.message || 'An error occurred';
           errors = exceptionResponse.violations || [];
         }
       }
 
-      let errorResponse: any = '';
+      let errorResponse: unknown = '';
       if (exception instanceof HttpException) {
         errorResponse = exception.getResponse();
       } else if (exception instanceof Error) {

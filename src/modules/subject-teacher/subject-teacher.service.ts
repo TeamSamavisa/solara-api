@@ -5,6 +5,7 @@ import { SubjectTeacher } from './entities/subject-teacher.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { GetSubjectTeachersQueryDto } from './dto/get-subject-teachers.dto';
 import { buildWhere } from 'src/utils/build-where';
+import { PaginatedResponse } from 'src/utils/types/paginated-response';
 
 @Injectable()
 export class SubjectTeacherService {
@@ -13,17 +14,21 @@ export class SubjectTeacherService {
     private readonly subjectModel: typeof SubjectTeacher,
   ) {}
 
-  async create(createSubjectTeacherDto: CreateSubjectTeacherDto) {
+  async create(
+    createSubjectTeacherDto: CreateSubjectTeacherDto,
+  ): Promise<SubjectTeacher> {
     const subjectTeacherData = {
       subject_id: createSubjectTeacherDto.subject_id,
       teacher_id: createSubjectTeacherDto.teacher_id,
     };
 
     const subjectTeacher = await this.subjectModel.create(subjectTeacherData);
-    return subjectTeacher.get();
+    return subjectTeacher.get() as SubjectTeacher;
   }
 
-  async list(query: GetSubjectTeachersQueryDto) {
+  async list(
+    query: GetSubjectTeachersQueryDto,
+  ): Promise<PaginatedResponse<SubjectTeacher>> {
     const { limit, offset, page, ...filter } = query;
 
     const result = await SubjectTeacher.findAndCountAll({
@@ -66,7 +71,10 @@ export class SubjectTeacherService {
     return subjectTeacher;
   }
 
-  async update(id: number, updateSubjectTeacherDto: UpdateSubjectTeacherDto) {
+  async update(
+    id: number,
+    updateSubjectTeacherDto: UpdateSubjectTeacherDto,
+  ): Promise<SubjectTeacher> {
     const subjectTeacher = await this.ensureRecordExists(id);
 
     const updateData: UpdateSubjectTeacherDto = {};
@@ -80,7 +88,7 @@ export class SubjectTeacherService {
     }
 
     await subjectTeacher.update(updateData);
-    return subjectTeacher.get();
+    return subjectTeacher.get() as SubjectTeacher;
   }
 
   async remove(id: number) {

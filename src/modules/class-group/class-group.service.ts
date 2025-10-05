@@ -5,6 +5,7 @@ import { ClassGroup } from './entities/class-group.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { GetClassGroupsQueryDto } from './dto/get-class-groups.dto';
 import { buildWhere } from 'src/utils/build-where';
+import { PaginatedResponse } from 'src/utils/types/paginated-response';
 
 @Injectable()
 export class ClassGroupService {
@@ -13,7 +14,7 @@ export class ClassGroupService {
     private readonly classGroupModel: typeof ClassGroup,
   ) {}
 
-  async create(createClassGroupDto: CreateClassGroupDto) {
+  async create(createClassGroupDto: CreateClassGroupDto): Promise<ClassGroup> {
     const classGroupData = {
       name: createClassGroupDto.name,
       semester: createClassGroupDto.semester,
@@ -24,10 +25,12 @@ export class ClassGroupService {
     };
 
     const classGroup = await this.classGroupModel.create(classGroupData);
-    return classGroup.get();
+    return classGroup.get() as ClassGroup;
   }
 
-  async list(query: GetClassGroupsQueryDto) {
+  async list(
+    query: GetClassGroupsQueryDto,
+  ): Promise<PaginatedResponse<ClassGroup>> {
     const { limit, offset, page, ...filter } = query;
 
     const result = await this.classGroupModel.findAndCountAll({
@@ -68,7 +71,10 @@ export class ClassGroupService {
     return classGroup;
   }
 
-  async update(id: number, updateClassGroupDto: UpdateClassGroupDto) {
+  async update(
+    id: number,
+    updateClassGroupDto: UpdateClassGroupDto,
+  ): Promise<ClassGroup> {
     const classGroup = await this.ensureRecordExists(id);
 
     const updateData: UpdateClassGroupDto = {};
@@ -98,7 +104,7 @@ export class ClassGroupService {
     }
 
     await classGroup.update(updateData);
-    return classGroup.get();
+    return classGroup.get() as ClassGroup;
   }
 
   async remove(id: number) {

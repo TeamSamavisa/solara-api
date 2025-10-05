@@ -13,10 +13,6 @@ export class SequelizeConfigService implements SequelizeOptionsFactory {
   constructor(private configService: ConfigService<AllConfigType>) {}
 
   createSequelizeOptions(): SequelizeModuleOptions {
-    const sslEnabled = this.configService.get('database.sslEnabled', {
-      infer: true,
-    });
-
     return {
       dialect: this.configService.get<'postgres' | 'mysql'>('database.type', {
         infer: true,
@@ -37,25 +33,6 @@ export class SequelizeConfigService implements SequelizeOptionsFactory {
       pool: {
         max: this.configService.get('database.maxConnections', { infer: true }),
       },
-      dialectOptions: sslEnabled
-        ? {
-            ssl: {
-              rejectUnauthorized: this.configService.get(
-                'database.rejectUnauthorized',
-                { infer: true },
-              ),
-              ca:
-                this.configService.get('database.ca', { infer: true }) ??
-                undefined,
-              key:
-                this.configService.get('database.key', { infer: true }) ??
-                undefined,
-              cert:
-                this.configService.get('database.cert', { infer: true }) ??
-                undefined,
-            },
-          }
-        : {},
     };
   }
 }

@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Space } from './entities/space.entity';
 import { GetSpacesQueryDto } from './dto/get-spaces.dto';
 import { buildWhere } from 'src/utils/build-where';
+import { PaginatedResponse } from 'src/utils/types/paginated-response';
 
 @Injectable()
 export class SpaceService {
@@ -13,7 +14,7 @@ export class SpaceService {
     private readonly spaceModel: typeof Space,
   ) {}
 
-  async create(createSpaceDto: CreateSpaceDto) {
+  async create(createSpaceDto: CreateSpaceDto): Promise<Space> {
     const spaceData = {
       name: createSpaceDto.name,
       floor: createSpaceDto.floor,
@@ -23,10 +24,10 @@ export class SpaceService {
     };
 
     const space = await this.spaceModel.create(spaceData);
-    return space.get();
+    return space.get() as Space;
   }
 
-  async list(query: GetSpacesQueryDto) {
+  async list(query: GetSpacesQueryDto): Promise<PaginatedResponse<Space>> {
     const { limit, offset, page, ...filter } = query;
 
     const result = await Space.findAndCountAll({
@@ -55,7 +56,7 @@ export class SpaceService {
     };
   }
 
-  async getById(id: number) {
+  async getById(id: number): Promise<Space> {
     const space = await this.spaceModel.findByPk(id, {
       include: ['spaceType'],
     });
@@ -67,7 +68,7 @@ export class SpaceService {
     return space.toJSON();
   }
 
-  async update(id: number, updateSpaceDto: UpdateSpaceDto) {
+  async update(id: number, updateSpaceDto: UpdateSpaceDto): Promise<Space> {
     const space = await this.ensureRecordExists(id);
 
     const updateData: UpdateSpaceDto = {};
@@ -93,7 +94,7 @@ export class SpaceService {
     }
 
     await space.update(updateData);
-    return space.get();
+    return space.get() as Space;
   }
 
   async remove(id: number) {

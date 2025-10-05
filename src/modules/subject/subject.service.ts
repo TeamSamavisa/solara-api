@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Subject } from './entities/subject.entity';
 import { GetSubjectsQueryDto } from './dto/get-subjects.dto';
 import { buildWhere } from 'src/utils/build-where';
+import { PaginatedResponse } from 'src/utils/types/paginated-response';
 
 @Injectable()
 export class SubjectService {
@@ -13,17 +14,17 @@ export class SubjectService {
     private readonly subjectModel: typeof Subject,
   ) {}
 
-  async create(createSubjectDto: CreateSubjectDto) {
+  async create(createSubjectDto: CreateSubjectDto): Promise<Subject> {
     const subjectData = {
       name: createSubjectDto.name,
       required_space_type_id: createSubjectDto.required_space_type_id,
     };
 
     const subject = await this.subjectModel.create(subjectData);
-    return subject.get();
+    return subject.get() as Subject;
   }
 
-  async list(query: GetSubjectsQueryDto) {
+  async list(query: GetSubjectsQueryDto): Promise<PaginatedResponse<Subject>> {
     const { limit, offset, page, ...filter } = query;
 
     const result = await Subject.findAndCountAll({
@@ -64,7 +65,10 @@ export class SubjectService {
     return subject;
   }
 
-  async update(id: number, updateSubjectDto: UpdateSubjectDto) {
+  async update(
+    id: number,
+    updateSubjectDto: UpdateSubjectDto,
+  ): Promise<Subject> {
     const subject = await this.ensureRecordExists(id);
 
     const updateData: UpdateSubjectDto = {};
@@ -79,7 +83,7 @@ export class SubjectService {
     }
 
     await subject.update(updateData);
-    return subject.get();
+    return subject.get() as Subject;
   }
 
   async remove(id: number) {

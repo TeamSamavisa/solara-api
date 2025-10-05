@@ -5,6 +5,7 @@ import { CourseType } from './entities/course-type.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { GetCourseTypesQueryDto } from './dto/get-course-types.dto';
 import { buildWhere } from 'src/utils/build-where';
+import { PaginatedResponse } from 'src/utils/types/paginated-response';
 
 @Injectable()
 export class CourseTypeService {
@@ -13,16 +14,18 @@ export class CourseTypeService {
     private readonly courseTypeModel: typeof CourseType,
   ) {}
 
-  async create(createCourseTypeDto: CreateCourseTypeDto) {
+  async create(createCourseTypeDto: CreateCourseTypeDto): Promise<CourseType> {
     const courseTypeData = {
       name: createCourseTypeDto.name,
     };
 
     const courseType = await this.courseTypeModel.create(courseTypeData);
-    return courseType.get();
+    return courseType.get() as CourseType;
   }
 
-  async list(query: GetCourseTypesQueryDto) {
+  async list(
+    query: GetCourseTypesQueryDto,
+  ): Promise<PaginatedResponse<CourseType>> {
     const { limit, offset, page, ...filter } = query;
 
     const result = await this.courseTypeModel.findAndCountAll({
@@ -55,7 +58,10 @@ export class CourseTypeService {
     return courseType;
   }
 
-  async update(id: number, updateCourseTypeDto: UpdateCourseTypeDto) {
+  async update(
+    id: number,
+    updateCourseTypeDto: UpdateCourseTypeDto,
+  ): Promise<CourseType> {
     const courseType = await this.ensureRecordExists(id);
 
     const updateData: UpdateCourseTypeDto = {};
@@ -65,7 +71,7 @@ export class CourseTypeService {
     }
 
     await courseType.update(updateData);
-    return courseType.get();
+    return courseType.get() as CourseType;
   }
 
   async remove(id: number) {
