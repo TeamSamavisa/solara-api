@@ -5,6 +5,7 @@ import { Shift } from './entities/shift.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { GetShiftsQueryDto } from './dto/get-shifts.dto';
 import { buildWhere } from 'src/utils/build-where';
+import { PaginatedResponse } from 'src/utils/types/paginated-response';
 
 @Injectable()
 export class ShiftService {
@@ -22,7 +23,7 @@ export class ShiftService {
     return shift.get() as Shift;
   }
 
-  async list(query: GetShiftsQueryDto) {
+  async list(query: GetShiftsQueryDto): Promise<PaginatedResponse<Shift>> {
     const { limit, offset, page, ...filter } = query;
 
     const result = await this.shiftModel.findAndCountAll({
@@ -52,6 +53,9 @@ export class ShiftService {
 
   async getById(id: number) {
     const shift = await this.shiftModel.findByPk(id);
+    if (!shift) {
+      throw new NotFoundException('Shift not found');
+    }
     return shift;
   }
 

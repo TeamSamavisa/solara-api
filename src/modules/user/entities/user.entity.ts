@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Table,
   Column,
@@ -22,23 +23,27 @@ import { SubjectTeacher } from 'src/modules/subject-teacher/entities/subject-tea
 }))
 @Table({ tableName: 'users' })
 export class User extends Model {
+  @ApiProperty()
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
   declare id: number;
 
+  @ApiProperty()
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   full_name: string;
 
+  @ApiProperty()
   @Column({
     type: DataType.STRING,
     unique: true,
   })
   registration: string;
 
+  @ApiProperty()
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -46,6 +51,7 @@ export class User extends Model {
   })
   email: string;
 
+  @ApiProperty()
   @Column({
     type: DataType.STRING,
     allowNull: false,

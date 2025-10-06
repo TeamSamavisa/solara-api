@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Schedule } from './entities/schedule.entity';
 import { GetSchedulesQueryDto } from './dto/get-schedules.dto';
 import { buildWhere } from 'src/utils/build-where';
+import { PaginatedResponse } from 'src/utils/types/paginated-response';
 
 @Injectable()
 export class ScheduleService {
@@ -24,7 +25,9 @@ export class ScheduleService {
     return schedule.get() as Schedule;
   }
 
-  async list(query: GetSchedulesQueryDto) {
+  async list(
+    query: GetSchedulesQueryDto,
+  ): Promise<PaginatedResponse<Schedule>> {
     const { limit, offset, page, ...filter } = query;
 
     const result = await Schedule.findAndCountAll({
@@ -54,6 +57,9 @@ export class ScheduleService {
 
   async getById(id: number) {
     const schedule = await Schedule.findByPk(id);
+    if (!schedule) {
+      throw new NotFoundException('Schedule not found');
+    }
     return schedule;
   }
 

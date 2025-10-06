@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Table,
   Column,
@@ -16,28 +17,34 @@ import { SubjectTeacher } from 'src/modules/subject-teacher/entities/subject-tea
 
 @Table({ tableName: 'subjects' })
 export class Subject extends Model {
+  @ApiProperty()
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
   declare id: number;
 
+  @ApiProperty()
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   name: string;
 
+  @ApiProperty()
   @ForeignKey(() => SpaceType)
   @Column(DataType.INTEGER)
   required_space_type_id: number;
 
+  @ApiProperty()
   @ForeignKey(() => Course)
   @Column(DataType.INTEGER)
   course_id: number;
 
+  @ApiProperty()
   @BelongsTo(() => SpaceType)
   requiredSpaceType: SpaceType;
 
+  @ApiProperty({ type: () => Course })
   @BelongsTo(() => Course)
   course: Course;
 

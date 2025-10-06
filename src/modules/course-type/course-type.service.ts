@@ -55,6 +55,9 @@ export class CourseTypeService {
 
   async getById(id: number) {
     const courseType = await this.courseTypeModel.findByPk(id);
+    if (!courseType) {
+      throw new NotFoundException('CourseType not found');
+    }
     return courseType;
   }
 

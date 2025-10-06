@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Table,
   Column,
@@ -12,23 +13,27 @@ import { ScheduleTeacher } from 'src/modules/schedule-teacher/entities/schedule-
 
 @Table({ tableName: 'schedules' })
 export class Schedule extends Model {
+  @ApiProperty()
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
   declare id: number;
 
+  @ApiProperty()
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   weekday: string;
 
+  @ApiProperty()
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   start_time: string;
 
+  @ApiProperty()
   @Column({
     type: DataType.STRING,
     allowNull: false,

@@ -5,6 +5,7 @@ import { SpaceType } from './entities/space-type.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { GetSpaceTypesQueryDto } from './dto/get-space-types.dto';
 import { buildWhere } from 'src/utils/build-where';
+import { PaginatedResponse } from 'src/utils/types/paginated-response';
 
 @Injectable()
 export class SpaceTypeService {
@@ -22,7 +23,9 @@ export class SpaceTypeService {
     return spaceType.get() as SpaceType;
   }
 
-  async list(query: GetSpaceTypesQueryDto) {
+  async list(
+    query: GetSpaceTypesQueryDto,
+  ): Promise<PaginatedResponse<SpaceType>> {
     const { limit, offset, page, ...filter } = query;
 
     const result = await this.spaceTypeModel.findAndCountAll({
@@ -52,6 +55,11 @@ export class SpaceTypeService {
 
   async getById(id: number) {
     const spaceType = await SpaceType.findByPk(id);
+
+    if (!spaceType) {
+      throw new NotFoundException('SpaceType not found');
+    }
+
     return spaceType;
   }
 

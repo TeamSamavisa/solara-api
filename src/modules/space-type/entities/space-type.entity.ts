@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Table,
   Column,
@@ -12,11 +13,13 @@ import { Subject } from 'src/modules/subject/entities/subject.entity';
 
 @Table({ tableName: 'space_types' })
 export class SpaceType extends Model {
+  @ApiProperty()
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
   declare id: number;
 
+  @ApiProperty()
   @Column({
     type: DataType.STRING,
     allowNull: false,

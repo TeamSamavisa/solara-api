@@ -11,6 +11,7 @@ import { User } from './entities/user.entity';
 import { GetUsersQueryDto } from './dto/get-users.dto';
 import { Op } from 'sequelize';
 import { buildWhere } from 'src/utils/build-where';
+import { PaginatedResponse } from 'src/utils/types/paginated-response';
 
 @Injectable()
 export class UserService {
@@ -50,7 +51,7 @@ export class UserService {
     return this.sanitizeUserResponse(user);
   }
 
-  async list(query: GetUsersQueryDto) {
+  async list(query: GetUsersQueryDto): Promise<PaginatedResponse<User>> {
     const { limit, offset, page, ...filter } = query;
 
     const result = await User.findAndCountAll({
@@ -81,6 +82,11 @@ export class UserService {
 
   async getById(id: number) {
     const user = await User.findByPk(id);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
     return user;
   }
 

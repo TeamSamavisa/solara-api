@@ -62,7 +62,7 @@ export class SpaceService {
     });
 
     if (!space) {
-      throw new NotFoundException();
+      throw new NotFoundException('Space not found');
     }
 
     return space.toJSON();
@@ -107,7 +107,7 @@ export class SpaceService {
     const space = await this.spaceModel.findByPk(id);
 
     if (!space) {
-      throw new NotFoundException();
+      throw new NotFoundException('Space not found');
     }
 
     return space;

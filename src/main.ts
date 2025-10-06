@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { AllConfigType } from './config/config.type';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json, urlencoded } from 'body-parser';
+import { PaginationMeta } from './utils/types/paginated-response';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -48,7 +49,9 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
-  const document = SwaggerModule.createDocument(app, options);
+  const document = SwaggerModule.createDocument(app, options, {
+    extraModels: [PaginationMeta],
+  });
   SwaggerModule.setup('/api/docs', app, document);
 
   await app.listen(process.env.PORT ?? 3000);

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Table,
   Column,
@@ -11,11 +12,13 @@ import { ClassGroup } from 'src/modules/class-group/entities/class-group.entity'
 
 @Table({ tableName: 'shifts' })
 export class Shift extends Model {
+  @ApiProperty()
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
   declare id: number;
 
+  @ApiProperty()
   @Column({
     type: DataType.STRING,
     allowNull: false,
