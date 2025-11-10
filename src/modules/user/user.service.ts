@@ -90,6 +90,16 @@ export class UserService {
     return user;
   }
 
+  async getByEmail(email: string) {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
   async update(
     id: number,
     updateUserDto: UpdateUserDto,
