@@ -34,7 +34,7 @@ export class SubjectTeacher extends Model {
   @BelongsTo(() => Subject)
   subject: Subject;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => User })
   @BelongsTo(() => User)
   teacher: User;
 }

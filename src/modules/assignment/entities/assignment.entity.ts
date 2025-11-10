@@ -48,23 +48,23 @@ export class Assignment extends Model {
   @Column(DataType.INTEGER)
   class_group_id: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => Schedule })
   @BelongsTo(() => Schedule)
   schedule: Schedule;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => User })
   @BelongsTo(() => User)
   teacher: User;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => Subject })
   @BelongsTo(() => Subject)
   subject: Subject;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => Space })
   @BelongsTo(() => Space)
   space: Space;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => ClassGroup })
   @BelongsTo(() => ClassGroup)
   classGroup: ClassGroup;
 }
