@@ -33,6 +33,7 @@ export class SpaceTypeService {
       limit,
       offset,
       order: [['createdAt', 'DESC']],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -54,7 +55,9 @@ export class SpaceTypeService {
   }
 
   async getById(id: number) {
-    const spaceType = await SpaceType.findByPk(id);
+    const spaceType = await SpaceType.findByPk(id, {
+      raw: true,
+    });
 
     if (!spaceType) {
       throw new NotFoundException('SpaceType not found');

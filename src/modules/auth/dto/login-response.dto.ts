@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from 'src/modules/user/entities/user.entity';
+import { UserResponseDto } from 'src/modules/user/dto/user-response.dto';
 
 export class LoginResponseDto {
   @ApiProperty()
@@ -11,8 +11,6 @@ export class LoginResponseDto {
   @ApiProperty()
   tokenExpires: number;
 
-  @ApiProperty({
-    type: () => User,
-  })
-  user: Omit<User, 'password_hash'>;
+  @ApiProperty({ type: () => UserResponseDto })
+  user: UserResponseDto;
 }

@@ -39,6 +39,7 @@ export class ClassGroupService {
       offset,
       order: [['createdAt', 'DESC']],
       include: ['shift', 'course'],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -62,6 +63,7 @@ export class ClassGroupService {
   async getById(id: number) {
     const classGroup = await this.classGroupModel.findByPk(id, {
       include: ['shift', 'course'],
+      raw: true,
     });
 
     if (!classGroup) {

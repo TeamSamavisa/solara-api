@@ -54,7 +54,7 @@ export class AuthService {
       role: user.role,
     });
 
-    const { password_hash, ...authenticatedUser } = user.get();
+    const { password_hash, ...authenticatedUser } = user;
 
     return {
       refreshToken,

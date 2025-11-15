@@ -35,6 +35,7 @@ export class ScheduleService {
       limit,
       offset,
       order: [['createdAt', 'DESC']],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -56,7 +57,9 @@ export class ScheduleService {
   }
 
   async getById(id: number) {
-    const schedule = await Schedule.findByPk(id);
+    const schedule = await Schedule.findByPk(id, {
+      raw: true,
+    });
     if (!schedule) {
       throw new NotFoundException('Schedule not found');
     }

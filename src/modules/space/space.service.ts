@@ -36,6 +36,7 @@ export class SpaceService {
       offset,
       order: [['createdAt', 'DESC']],
       include: ['spaceType'],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -59,6 +60,7 @@ export class SpaceService {
   async getById(id: number): Promise<Space> {
     const space = await this.spaceModel.findByPk(id, {
       include: ['spaceType'],
+      raw: true,
     });
 
     if (!space) {

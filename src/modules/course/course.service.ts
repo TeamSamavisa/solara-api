@@ -33,6 +33,7 @@ export class CourseService {
       offset,
       order: [['createdAt', 'DESC']],
       include: ['course_type'],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -56,6 +57,7 @@ export class CourseService {
   async getById(id: number) {
     const course = await this.courseModel.findByPk(id, {
       include: ['courseType'],
+      raw: true,
     });
 
     if (!course) {
