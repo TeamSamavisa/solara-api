@@ -31,7 +31,7 @@ export class CourseService {
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['name', 'DESC']],
       include: ['course_type'],
       raw: true,
     });

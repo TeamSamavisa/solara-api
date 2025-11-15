@@ -23,7 +23,7 @@ export class UserService {
   async create(
     createUserDto: CreateUserDto,
   ): Promise<Omit<User, 'password_hash'>> {
-    const existingEmail = await User.findOne({
+    const existingEmail = await this.userModel.findOne({
       where: { email: createUserDto.email },
     });
     if (existingEmail) {
@@ -31,7 +31,7 @@ export class UserService {
     }
 
     if (createUserDto.registration) {
-      const existingRegistration = await User.findOne({
+      const existingRegistration = await this.userModel.findOne({
         where: { email: createUserDto.registration },
       });
       if (existingRegistration) {
@@ -54,11 +54,11 @@ export class UserService {
   async list(query: GetUsersQueryDto): Promise<PaginatedResponse<User>> {
     const { limit, offset, page, ...filter } = query;
 
-    const result = await User.findAndCountAll({
+    const result = await this.userModel.findAndCountAll({
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['full_name', 'DESC']],
       raw: true,
     });
 
@@ -82,7 +82,7 @@ export class UserService {
   }
 
   async getById(id: number) {
-    const user = await User.findByPk(id, { raw: true });
+    const user = await this.userModel.findByPk(id, { raw: true });
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -92,7 +92,7 @@ export class UserService {
   }
 
   async getByEmail(email: string) {
-    const user = await User.findOne({
+    const user = await this.userModel.findOne({
       where: { email },
       attributes: ['id', 'email', 'role', 'password_hash'],
       raw: true,
@@ -113,11 +113,23 @@ export class UserService {
 
     if (
       updateUserDto.email &&
-      (await User.findOne({
+      (await this.userModel.findOne({
         where: { email: updateUserDto.email, id: { [Op.ne]: id } },
       }))
     ) {
       throw new ConflictException('Email already taken');
+    }
+
+    if (
+      updateUserDto.registration &&
+      (await this.userModel.findOne({
+        where: {
+          registration: updateUserDto.registration,
+          id: { [Op.ne]: id },
+        },
+      }))
+    ) {
+      throw new ConflictException('Registration already taken');
     }
 
     // Transform password to password_hash if provided
@@ -126,9 +138,15 @@ export class UserService {
     if (updateUserDto.full_name !== undefined) {
       updateData.full_name = updateUserDto.full_name;
     }
+
     if (updateUserDto.email) {
       updateData.email = updateUserDto.email;
     }
+
+    if (updateUserDto.registration) {
+      updateData.registration = updateUserDto.registration;
+    }
+
     if (updateUserDto.password) {
       updateData.password_hash = await this.hashPassword(
         updateUserDto.password,
@@ -150,10 +168,12 @@ export class UserService {
   }
 
   private async ensureRecordExists(id: number): Promise<User> {
-    const user = await this.getById(id);
+    const user = await this.userModel.findByPk(id);
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
     return user;
   }
 

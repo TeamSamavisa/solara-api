@@ -32,7 +32,7 @@ export class CourseTypeService {
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['name', 'DESC']],
       raw: true,
     });
 
@@ -87,7 +87,7 @@ export class CourseTypeService {
   }
 
   private async ensureRecordExists(id: number): Promise<CourseType> {
-    const courseType = await this.getById(id);
+    const courseType = await this.courseTypeModel.findByPk(id);
     if (!courseType) {
       throw new NotFoundException('CourseType not found');
     }

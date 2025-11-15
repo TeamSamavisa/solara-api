@@ -27,11 +27,11 @@ export class SubjectService {
   async list(query: GetSubjectsQueryDto): Promise<PaginatedResponse<Subject>> {
     const { limit, offset, page, ...filter } = query;
 
-    const result = await Subject.findAndCountAll({
+    const result = await this.subjectModel.findAndCountAll({
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['name', 'DESC']],
       include: ['requiredSpaceType'],
       raw: true,
     });
@@ -55,7 +55,7 @@ export class SubjectService {
   }
 
   async getById(id: number) {
-    const subject = await Subject.findByPk(id, {
+    const subject = await this.subjectModel.findByPk(id, {
       include: ['requiredSpaceType'],
       raw: true,
     });

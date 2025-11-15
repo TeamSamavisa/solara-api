@@ -30,7 +30,7 @@ export class ScheduleService {
   ): Promise<PaginatedResponse<Schedule>> {
     const { limit, offset, page, ...filter } = query;
 
-    const result = await Schedule.findAndCountAll({
+    const result = await this.scheduleModel.findAndCountAll({
       where: buildWhere(filter),
       limit,
       offset,
@@ -57,7 +57,7 @@ export class ScheduleService {
   }
 
   async getById(id: number) {
-    const schedule = await Schedule.findByPk(id, {
+    const schedule = await this.scheduleModel.findByPk(id, {
       raw: true,
     });
     if (!schedule) {
@@ -97,7 +97,7 @@ export class ScheduleService {
   }
 
   private async ensureRecordExists(id: number): Promise<Schedule> {
-    const schedule = await this.getById(id);
+    const schedule = await this.scheduleModel.findByPk(id);
     if (!schedule) {
       throw new NotFoundException('Schedule not found');
     }

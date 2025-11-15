@@ -11,7 +11,7 @@ import { PaginatedResponse } from 'src/utils/types/paginated-response';
 export class SubjectTeacherService {
   constructor(
     @InjectModel(SubjectTeacher)
-    private readonly subjectModel: typeof SubjectTeacher,
+    private readonly subjectTeacherModel: typeof SubjectTeacher,
   ) {}
 
   async create(
@@ -22,7 +22,8 @@ export class SubjectTeacherService {
       teacher_id: createSubjectTeacherDto.teacher_id,
     };
 
-    const subjectTeacher = await this.subjectModel.create(subjectTeacherData);
+    const subjectTeacher =
+      await this.subjectTeacherModel.create(subjectTeacherData);
     return subjectTeacher.get() as SubjectTeacher;
   }
 
@@ -31,7 +32,7 @@ export class SubjectTeacherService {
   ): Promise<PaginatedResponse<SubjectTeacher>> {
     const { limit, offset, page, ...filter } = query;
 
-    const result = await SubjectTeacher.findAndCountAll({
+    const result = await this.subjectTeacherModel.findAndCountAll({
       where: buildWhere(filter),
       limit,
       offset,
@@ -59,7 +60,7 @@ export class SubjectTeacherService {
   }
 
   async getById(id: number) {
-    const subjectTeacher = await SubjectTeacher.findByPk(id, {
+    const subjectTeacher = await this.subjectTeacherModel.findByPk(id, {
       include: ['subject', 'teacher'],
       raw: true,
     });
@@ -100,7 +101,7 @@ export class SubjectTeacherService {
   }
 
   private async ensureRecordExists(id: number): Promise<SubjectTeacher> {
-    const subjectTeacher = await this.subjectModel.findByPk(id);
+    const subjectTeacher = await this.subjectTeacherModel.findByPk(id);
 
     if (!subjectTeacher) {
       throw new NotFoundException(
