@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsOptional, IsNumberString } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { BaseQueryDto } from 'src/utils/dto/base-query.dto';
 
@@ -10,11 +10,11 @@ export class GetUsersQueryDto extends BaseQueryDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsEmail()
+  @IsString()
   email?: string;
 
   @ApiPropertyOptional()
-  @IsNumberString()
+  @IsString()
   @IsOptional()
   registration?: string;
 }

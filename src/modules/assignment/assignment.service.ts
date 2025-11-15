@@ -38,6 +38,7 @@ export class AssignmentService {
       offset,
       order: [['createdAt', 'DESC']],
       include: ['schedule', 'teacher', 'subject', 'space', 'classGroup'],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -61,6 +62,7 @@ export class AssignmentService {
   async getById(id: number) {
     const assignment = await this.assignmentModel.findByPk(id, {
       include: ['schedule', 'teacher', 'subject', 'space', 'classGroup'],
+      raw: true,
     });
 
     if (!assignment) {

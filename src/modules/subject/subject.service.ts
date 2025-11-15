@@ -33,6 +33,7 @@ export class SubjectService {
       offset,
       order: [['createdAt', 'DESC']],
       include: ['requiredSpaceType'],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -56,6 +57,7 @@ export class SubjectService {
   async getById(id: number) {
     const subject = await Subject.findByPk(id, {
       include: ['requiredSpaceType'],
+      raw: true,
     });
 
     if (!subject) {

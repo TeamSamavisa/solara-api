@@ -59,6 +59,7 @@ export class UserService {
       limit,
       offset,
       order: [['createdAt', 'DESC']],
+      raw: true,
     });
 
     // Calculate pagination metadata
@@ -81,7 +82,7 @@ export class UserService {
   }
 
   async getById(id: number) {
-    const user = await User.findByPk(id);
+    const user = await User.findByPk(id, { raw: true });
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -91,7 +92,11 @@ export class UserService {
   }
 
   async getByEmail(email: string) {
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      where: { email },
+      attributes: ['id', 'email', 'role', 'password_hash'],
+      raw: true,
+    });
 
     if (!user) {
       throw new NotFoundException('User not found');

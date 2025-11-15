@@ -37,6 +37,7 @@ export class SubjectTeacherService {
       offset,
       order: [['createdAt', 'DESC']],
       include: ['subject', 'teacher'],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -60,6 +61,7 @@ export class SubjectTeacherService {
   async getById(id: number) {
     const subjectTeacher = await SubjectTeacher.findByPk(id, {
       include: ['subject', 'teacher'],
+      raw: true,
     });
 
     if (!subjectTeacher) {
