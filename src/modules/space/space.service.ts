@@ -30,11 +30,11 @@ export class SpaceService {
   async list(query: GetSpacesQueryDto): Promise<PaginatedResponse<Space>> {
     const { limit, offset, page, ...filter } = query;
 
-    const result = await Space.findAndCountAll({
+    const result = await this.spaceModel.findAndCountAll({
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['name', 'DESC']],
       include: ['spaceType'],
       raw: true,
     });

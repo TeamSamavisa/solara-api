@@ -82,7 +82,7 @@ export class ShiftService {
   }
 
   private async ensureRecordExists(id: number): Promise<Shift> {
-    const shift = await this.getById(id);
+    const shift = await this.shiftModel.findByPk(id);
     if (!shift) {
       throw new NotFoundException('Shift not found');
     }

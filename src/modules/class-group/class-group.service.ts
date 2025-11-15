@@ -37,7 +37,7 @@ export class ClassGroupService {
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['name', 'DESC']],
       include: ['shift', 'course'],
       raw: true,
     });
