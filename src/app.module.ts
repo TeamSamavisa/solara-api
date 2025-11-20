@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AppController } from 'src/app.controller';
 import { AppService } from 'src/app.service';
+import { RabbitMQModule } from './modules/rabbitmq/rabbitmq.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AssignmentModule } from 'src/modules/assignment/assignment.module';
 import { ClassGroupModule } from 'src/modules/class-group/class-group.module';
@@ -20,12 +21,14 @@ import { SpaceModule } from './modules/space/space.module';
 import appConfig from 'src/config/app.config';
 import databaseConfig from 'src/database/config/database.config';
 import authConfig from './modules/auth/config/auth.config';
+import rabbitmqConfig from './modules/rabbitmq/config/rabbitmq.config';
 
 @Module({
   imports: [
+    RabbitMQModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [authConfig, appConfig, databaseConfig],
+      load: [authConfig, appConfig, databaseConfig, rabbitmqConfig],
       envFilePath: ['.env'],
     }),
     SequelizeModule.forRootAsync({
