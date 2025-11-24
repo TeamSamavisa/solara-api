@@ -13,7 +13,6 @@ import {
 import { Assignment } from 'src/modules/assignment/entities/assignment.entity';
 import { Course } from 'src/modules/course/entities/course.entity';
 import { SpaceType } from 'src/modules/space-type/entities/space-type.entity';
-import { SubjectTeacher } from 'src/modules/subject-teacher/entities/subject-teacher.entity';
 
 @Table({ tableName: 'subjects' })
 export class Subject extends Model {
@@ -47,9 +46,6 @@ export class Subject extends Model {
   @ApiProperty({ type: () => Course })
   @BelongsTo(() => Course)
   course: Course;
-
-  @HasMany(() => SubjectTeacher)
-  subjectTeachers: SubjectTeacher[];
 
   @HasMany(() => Assignment)
   assignments: Assignment[];
