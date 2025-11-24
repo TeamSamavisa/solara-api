@@ -33,6 +33,13 @@ export class SequelizeConfigService implements SequelizeOptionsFactory {
       pool: {
         max: this.configService.get('database.maxConnections', { infer: true }),
       },
+      define: {
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_unicode_ci',
+      },
+      dialectOptions: {
+        charset: 'utf8mb4',
+      },
     };
   }
 }
