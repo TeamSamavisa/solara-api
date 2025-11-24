@@ -32,7 +32,7 @@ export class CourseTypeService {
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['name', 'DESC']],
+      order: [['name', 'ASC']],
       raw: true,
     });
 

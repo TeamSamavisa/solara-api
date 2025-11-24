@@ -31,7 +31,7 @@ export class SubjectService {
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['name', 'DESC']],
+      order: [['name', 'ASC']],
       include: ['requiredSpaceType'],
       raw: true,
     });
@@ -42,7 +42,7 @@ export class SubjectService {
     const hasPrevPage = page > 1;
 
     return {
-      content: result.rows.map((row) => row.toJSON()),
+      content: result.rows,
       pagination: {
         currentPage: page,
         totalPages,

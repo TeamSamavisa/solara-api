@@ -37,7 +37,7 @@ export class ClassGroupService {
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['name', 'DESC']],
+      order: [['name', 'ASC']],
       include: ['shift', 'course'],
       raw: true,
     });
@@ -48,7 +48,7 @@ export class ClassGroupService {
     const hasPrevPage = page > 1;
 
     return {
-      content: result.rows.map((row) => row.toJSON()),
+      content: result.rows,
       pagination: {
         currentPage: page,
         totalPages,
