@@ -5,6 +5,7 @@ import {
   IsEmail,
   Matches,
   IsOptional,
+  IsIn,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -17,13 +18,25 @@ export class CreateUserDto {
   @IsEmail({}, { message: 'Invalid email format' })
   email: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
-  @MinLength(1, { message: 'Password is required' })
-  password: string;
+  @MinLength(6, { message: 'Password must be at least 6 characters' })
+  password?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @Matches(/^\d+$/, { message: 'Registration must be a numeric string' })
   registration?: string;
+
+  @ApiPropertyOptional({
+    enum: ['admin', 'principal', 'coordinator', 'teacher'],
+    default: 'teacher',
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(['admin', 'principal', 'coordinator', 'teacher'], {
+    message: 'Role must be one of: admin, principal, coordinator, teacher',
+  })
+  role?: string;
 }
