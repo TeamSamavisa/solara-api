@@ -32,7 +32,7 @@ export class SpaceTypeService {
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['name', 'DESC']],
+      order: [['name', 'ASC']],
       raw: true,
     });
 

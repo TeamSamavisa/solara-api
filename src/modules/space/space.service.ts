@@ -34,7 +34,7 @@ export class SpaceService {
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['name', 'DESC']],
+      order: [['name', 'ASC']],
       include: ['spaceType'],
       raw: true,
     });
@@ -45,7 +45,7 @@ export class SpaceService {
     const hasPrevPage = page > 1;
 
     return {
-      content: result.rows.map((row) => row.toJSON()),
+      content: result.rows,
       pagination: {
         currentPage: page,
         totalPages,
