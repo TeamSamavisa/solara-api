@@ -74,6 +74,21 @@ export class UserController {
     return this.userService.list(query);
   }
 
+  @Get('teachers')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get all teachers',
+    description: 'Retrieves a list of all teachers with their details.',
+  })
+  @ApiPaginatedResponse(User)
+  @ApiResponse({
+    status: 404,
+    description: 'No teacher found',
+  })
+  listTeachers(@Query() query: GetUsersQueryDto) {
+    return this.userService.listTeachers(query);
+  }
+
   @Get(':id')
   @ApiOkResponse({
     type: User,

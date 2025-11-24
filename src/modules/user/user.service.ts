@@ -39,16 +39,23 @@ export class UserService {
       }
     }
 
-    // Transform password to password_hash
+    // generate random password if not provided
+    const password = createUserDto.password || this.generateRandomPassword();
+
+    // transform password to password_hash
     const userData = {
       full_name: createUserDto.full_name,
       email: createUserDto.email,
-      role: 'teacher',
-      password_hash: await this.hashPassword(createUserDto.password),
+      registration: createUserDto.registration,
+      role: createUserDto.role || 'teacher',
+      password_hash: await this.hashPassword(password),
     };
 
     const user = await this.userModel.create(userData);
-    return this.sanitizeUserResponse(user);
+
+    const result = this.sanitizeUserResponse(user);
+
+    return result;
   }
 
   async list(query: GetUsersQueryDto): Promise<PaginatedResponse<User>> {
@@ -58,11 +65,48 @@ export class UserService {
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['full_name', 'DESC']],
+      order: [['full_name', 'ASC']],
       raw: true,
     });
 
-    // Calculate pagination metadata
+    // calculate pagination metadata
+    const totalItems = result.count;
+    const totalPages = Math.ceil(totalItems / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return {
+      content: result.rows,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems,
+        itemsPerPage: limit,
+        hasNextPage,
+        hasPrevPage,
+      },
+    };
+  }
+
+  async listTeachers(
+    query: GetUsersQueryDto,
+  ): Promise<PaginatedResponse<User>> {
+    const { limit, offset, page, ...filter } = query;
+
+    const whereClause = {
+      ...buildWhere(filter),
+      role: { [Op.in]: ['teacher', 'coordinator'] },
+    };
+
+    const result = await this.userModel.findAndCountAll({
+      where: whereClause,
+      limit,
+      offset,
+      order: [['full_name', 'ASC']],
+      raw: true,
+    });
+
+    // calculate pagination metadata
     const totalItems = result.count;
     const totalPages = Math.ceil(totalItems / limit);
     const hasNextPage = page < totalPages;
@@ -132,7 +176,7 @@ export class UserService {
       throw new ConflictException('Registration already taken');
     }
 
-    // Transform password to password_hash if provided
+    // transform password to password_hash if provided
     const updateData: UpdateUserDto & { password_hash?: string } = {};
 
     if (updateUserDto.full_name !== undefined) {
@@ -145,6 +189,10 @@ export class UserService {
 
     if (updateUserDto.registration) {
       updateData.registration = updateUserDto.registration;
+    }
+
+    if (updateUserDto.role) {
+      updateData.role = updateUserDto.role;
     }
 
     if (updateUserDto.password) {
@@ -175,6 +223,16 @@ export class UserService {
     }
 
     return user;
+  }
+
+  private generateRandomPassword(): string {
+    const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*';
+    let password = '';
+    for (let i = 0; i < 8; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
   }
 
   private sanitizeUserResponse(user: User): Omit<User, 'password_hash'> {
