@@ -11,7 +11,6 @@ import {
 } from 'sequelize-typescript';
 import { Assignment } from 'src/modules/assignment/entities/assignment.entity';
 import { ScheduleTeacher } from 'src/modules/schedule-teacher/entities/schedule-teacher.entity';
-import { SubjectTeacher } from 'src/modules/subject-teacher/entities/subject-teacher.entity';
 
 @Scopes(() => ({
   defaultScope: {
@@ -63,9 +62,6 @@ export class User extends Model {
     allowNull: false,
   })
   password_hash: string;
-
-  @HasMany(() => SubjectTeacher)
-  subjectTeachers: SubjectTeacher[];
 
   @HasMany(() => ScheduleTeacher)
   scheduleTeachers: ScheduleTeacher[];

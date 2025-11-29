@@ -6,6 +6,11 @@ import { Assignment } from './entities/assignment.entity';
 import { GetAssignmentsQueryDto } from './dto/get-assignments.dto';
 import { buildWhere } from 'src/utils/build-where';
 import { PaginatedResponse } from 'src/utils/types/paginated-response';
+import { User } from '../user/entities/user.entity';
+import { Subject } from '../subject/entities/subject.entity';
+import { Schedule } from '../schedule/entities/schedule.entity';
+import { Space } from '../space/entities/space.entity';
+import { ClassGroup } from '../class-group/entities/class-group.entity';
 
 @Injectable()
 export class AssignmentService {
@@ -32,25 +37,63 @@ export class AssignmentService {
   ): Promise<PaginatedResponse<Assignment>> {
     const { limit, offset, page, ...filter } = query;
 
-    const result = await this.assignmentModel.findAndCountAll({
-      where: buildWhere(filter),
+    const whereClause = buildWhere(filter);
+
+    const { rows, count } = await this.assignmentModel.findAndCountAll({
+      where: whereClause,
       limit,
       offset,
       order: [['createdAt', 'DESC']],
-      include: ['schedule', 'teacher', 'subject', 'space', 'classGroup'],
+      include: [
+        {
+          model: User,
+          as: 'teacher',
+          attributes: ['id', 'full_name', 'email'],
+        },
+        { model: Subject, as: 'subject', attributes: ['id', 'name'] },
+        {
+          model: Schedule,
+          as: 'schedule',
+          attributes: ['id', 'weekday', 'start_time', 'end_time'],
+        },
+        { model: Space, as: 'space', attributes: ['id', 'name', 'capacity'] },
+        { model: ClassGroup, as: 'classGroup', attributes: ['id', 'name'] },
+      ],
+      attributes: {
+        include: [
+          [
+            this.assignmentModel.sequelize!.literal(`
+              CASE 
+                WHEN \`Assignment\`.schedule_id IS NULL THEN false
+                WHEN NOT EXISTS (
+                  SELECT 1 FROM schedule_teachers st 
+                  WHERE st.teacher_id = \`Assignment\`.teacher_id
+                ) THEN false
+                WHEN EXISTS (
+                  SELECT 1 FROM schedule_teachers st 
+                  WHERE st.teacher_id = \`Assignment\`.teacher_id 
+                  AND st.schedule_id = \`Assignment\`.schedule_id
+                ) THEN false
+                ELSE true
+              END
+            `),
+            'violates_availability',
+          ],
+        ],
+      },
+      raw: true,
     });
 
-    const totalItems = result.count;
-    const totalPages = Math.ceil(totalItems / limit);
+    const totalPages = Math.ceil(count / limit);
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
 
     return {
-      content: result.rows.map((row) => row.toJSON()),
+      content: rows,
       pagination: {
         currentPage: page,
         totalPages,
-        totalItems,
+        totalItems: count,
         itemsPerPage: limit,
         hasNextPage,
         hasPrevPage,
@@ -60,7 +103,28 @@ export class AssignmentService {
 
   async getById(id: number) {
     const assignment = await this.assignmentModel.findByPk(id, {
-      include: ['schedule', 'teacher', 'subject', 'space', 'classGroup'],
+      attributes: {
+        include: [
+          [
+            this.assignmentModel.sequelize!.literal(`
+              CASE 
+                WHEN \`Assignment\`.schedule_id IS NULL THEN false
+                WHEN NOT EXISTS (
+                  SELECT 1 FROM schedule_teachers st 
+                  WHERE st.teacher_id = \`Assignment\`.teacher_id
+                ) THEN false
+                WHEN EXISTS (
+                  SELECT 1 FROM schedule_teachers st 
+                  WHERE st.teacher_id = \`Assignment\`.teacher_id 
+                  AND st.schedule_id = \`Assignment\`.schedule_id
+                ) THEN false
+                ELSE true
+              END
+            `),
+            'violates',
+          ],
+        ],
+      },
     });
 
     if (!assignment) {

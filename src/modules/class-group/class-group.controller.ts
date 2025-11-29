@@ -25,7 +25,7 @@ import {
 import { ClassGroup } from './entities/class-group.entity';
 import { ApiPaginatedResponse } from 'src/utils/decorators/api-paginated-response.decorator';
 
-@Controller('classGroup')
+@Controller('class-group')
 export class ClassGroupController {
   constructor(private readonly classGroupService: ClassGroupService) {}
 

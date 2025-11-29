@@ -31,6 +31,7 @@ export class ShiftService {
       limit,
       offset,
       order: [['createdAt', 'DESC']],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -52,7 +53,9 @@ export class ShiftService {
   }
 
   async getById(id: number) {
-    const shift = await this.shiftModel.findByPk(id);
+    const shift = await this.shiftModel.findByPk(id, {
+      raw: true,
+    });
     if (!shift) {
       throw new NotFoundException('Shift not found');
     }
@@ -79,7 +82,7 @@ export class ShiftService {
   }
 
   private async ensureRecordExists(id: number): Promise<Shift> {
-    const shift = await this.getById(id);
+    const shift = await this.shiftModel.findByPk(id);
     if (!shift) {
       throw new NotFoundException('Shift not found');
     }

@@ -32,7 +32,8 @@ export class SpaceTypeService {
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['name', 'ASC']],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -54,7 +55,9 @@ export class SpaceTypeService {
   }
 
   async getById(id: number) {
-    const spaceType = await SpaceType.findByPk(id);
+    const spaceType = await this.spaceTypeModel.findByPk(id, {
+      raw: true,
+    });
 
     if (!spaceType) {
       throw new NotFoundException('SpaceType not found');
@@ -86,7 +89,7 @@ export class SpaceTypeService {
   }
 
   private async ensureRecordExists(id: number): Promise<SpaceType> {
-    const spaceType = await this.getById(id);
+    const spaceType = await this.spaceTypeModel.findByPk(id);
     if (!spaceType) {
       throw new NotFoundException('SpaceType not found');
     }

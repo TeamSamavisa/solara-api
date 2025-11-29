@@ -31,8 +31,9 @@ export class CourseService {
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['name', 'ASC']],
       include: ['course_type'],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -41,7 +42,7 @@ export class CourseService {
     const hasPrevPage = page > 1;
 
     return {
-      content: result.rows.map((row) => row.toJSON()),
+      content: result.rows,
       pagination: {
         currentPage: page,
         totalPages,
@@ -56,6 +57,7 @@ export class CourseService {
   async getById(id: number) {
     const course = await this.courseModel.findByPk(id, {
       include: ['courseType'],
+      raw: true,
     });
 
     if (!course) {

@@ -27,12 +27,13 @@ export class SubjectService {
   async list(query: GetSubjectsQueryDto): Promise<PaginatedResponse<Subject>> {
     const { limit, offset, page, ...filter } = query;
 
-    const result = await Subject.findAndCountAll({
+    const result = await this.subjectModel.findAndCountAll({
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['name', 'ASC']],
       include: ['requiredSpaceType'],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -41,7 +42,7 @@ export class SubjectService {
     const hasPrevPage = page > 1;
 
     return {
-      content: result.rows.map((row) => row.toJSON()),
+      content: result.rows,
       pagination: {
         currentPage: page,
         totalPages,
@@ -54,8 +55,9 @@ export class SubjectService {
   }
 
   async getById(id: number) {
-    const subject = await Subject.findByPk(id, {
+    const subject = await this.subjectModel.findByPk(id, {
       include: ['requiredSpaceType'],
+      raw: true,
     });
 
     if (!subject) {

@@ -30,12 +30,13 @@ export class SpaceService {
   async list(query: GetSpacesQueryDto): Promise<PaginatedResponse<Space>> {
     const { limit, offset, page, ...filter } = query;
 
-    const result = await Space.findAndCountAll({
+    const result = await this.spaceModel.findAndCountAll({
       where: buildWhere(filter),
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['name', 'ASC']],
       include: ['spaceType'],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -44,7 +45,7 @@ export class SpaceService {
     const hasPrevPage = page > 1;
 
     return {
-      content: result.rows.map((row) => row.toJSON()),
+      content: result.rows,
       pagination: {
         currentPage: page,
         totalPages,
@@ -59,6 +60,7 @@ export class SpaceService {
   async getById(id: number): Promise<Space> {
     const space = await this.spaceModel.findByPk(id, {
       include: ['spaceType'],
+      raw: true,
     });
 
     if (!space) {

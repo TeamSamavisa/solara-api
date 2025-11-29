@@ -38,6 +38,7 @@ export class ScheduleTeacherService {
       offset,
       order: [['createdAt', 'DESC']],
       include: ['schedule', 'teacher'],
+      raw: true,
     });
 
     const totalItems = result.count;
@@ -46,7 +47,7 @@ export class ScheduleTeacherService {
     const hasPrevPage = page > 1;
 
     return {
-      content: result.rows.map((row) => row.toJSON()),
+      content: result.rows,
       pagination: {
         currentPage: page,
         totalPages,
@@ -61,6 +62,7 @@ export class ScheduleTeacherService {
   async getById(id: number) {
     const scheduleTeacher = await this.scheduleTeacherModel.findByPk(id, {
       include: ['schedule', 'teacher'],
+      raw: true,
     });
 
     if (!scheduleTeacher) {
