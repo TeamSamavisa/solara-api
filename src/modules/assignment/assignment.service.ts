@@ -11,6 +11,8 @@ import { Subject } from '../subject/entities/subject.entity';
 import { Schedule } from '../schedule/entities/schedule.entity';
 import { Space } from '../space/entities/space.entity';
 import { ClassGroup } from '../class-group/entities/class-group.entity';
+import { Course } from '../course/entities/course.entity';
+import { Shift } from '../shift/entities/shift.entity';
 
 @Injectable()
 export class AssignmentService {
@@ -57,7 +59,23 @@ export class AssignmentService {
           attributes: ['id', 'weekday', 'start_time', 'end_time'],
         },
         { model: Space, as: 'space', attributes: ['id', 'name', 'capacity'] },
-        { model: ClassGroup, as: 'classGroup', attributes: ['id', 'name'] },
+        {
+          model: ClassGroup,
+          as: 'classGroup',
+          attributes: ['id', 'name'],
+          include: [
+            {
+              model: Course,
+              as: 'course',
+              attributes: ['id', 'name'],
+            },
+            {
+              model: Shift,
+              as: 'shift',
+              attributes: ['id', 'name'],
+            },
+          ],
+        },
       ],
       attributes: {
         include: [
