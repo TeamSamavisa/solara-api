@@ -21,10 +21,12 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { SpaceType } from './entities/space-type.entity';
 import { ApiPaginatedResponse } from 'src/utils/decorators/api-paginated-response.decorator';
 
+@ApiTags('Space Types')
 @Controller('space-type')
 export class SpaceTypeController {
   constructor(private readonly spaceTypeService: SpaceTypeService) {}

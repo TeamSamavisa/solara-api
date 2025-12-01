@@ -21,10 +21,12 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { Subject } from './entities/subject.entity';
 import { ApiPaginatedResponse } from 'src/utils/decorators/api-paginated-response.decorator';
 
+@ApiTags('Subjects')
 @Controller('subject')
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}

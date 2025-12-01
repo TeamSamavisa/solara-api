@@ -21,10 +21,12 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { ClassGroup } from './entities/class-group.entity';
 import { ApiPaginatedResponse } from 'src/utils/decorators/api-paginated-response.decorator';
 
+@ApiTags('Class Groups')
 @Controller('class-group')
 export class ClassGroupController {
   constructor(private readonly classGroupService: ClassGroupService) {}

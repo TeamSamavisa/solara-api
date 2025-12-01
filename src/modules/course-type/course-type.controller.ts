@@ -21,10 +21,12 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { CourseType } from './entities/course-type.entity';
 import { ApiPaginatedResponse } from 'src/utils/decorators/api-paginated-response.decorator';
 
+@ApiTags('Course Types')
 @Controller('course-type')
 export class CourseTypeController {
   constructor(private readonly courseTypeService: CourseTypeService) {}
