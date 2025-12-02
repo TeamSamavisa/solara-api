@@ -32,7 +32,7 @@ export class CourseService {
       limit,
       offset,
       order: [['name', 'ASC']],
-      include: ['course_type'],
+      include: ['courseType'],
       raw: true,
     });
 
