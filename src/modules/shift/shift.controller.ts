@@ -21,10 +21,12 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { Shift } from './entities/shift.entity';
 import { ApiPaginatedResponse } from 'src/utils/decorators/api-paginated-response.decorator';
 
+@ApiTags('Shifts')
 @Controller('shift')
 export class ShiftController {
   constructor(private readonly shiftService: ShiftService) {}

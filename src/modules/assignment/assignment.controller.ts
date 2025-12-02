@@ -21,10 +21,12 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { Assignment } from './entities/assignment.entity';
 import { ApiPaginatedResponse } from 'src/utils/decorators/api-paginated-response.decorator';
 
+@ApiTags('Assignments')
 @Controller('assignment')
 export class AssignmentController {
   constructor(private readonly assignmentService: AssignmentService) {}

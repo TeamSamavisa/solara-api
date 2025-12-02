@@ -21,10 +21,12 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { Schedule } from './entities/schedule.entity';
 import { ApiPaginatedResponse } from 'src/utils/decorators/api-paginated-response.decorator';
 
+@ApiTags('Schedules')
 @Controller('schedule')
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
