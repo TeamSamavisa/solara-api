@@ -11,4 +11,9 @@ export class CreateSubjectDto {
   @IsInt()
   @IsPositive({ message: 'Required space type ID must be a positive integer' })
   required_space_type_id: number;
+
+  @ApiProperty()
+  @IsInt()
+  @IsPositive({ message: 'Required course ID must be a positive integer' })
+  course_id: number;
 }

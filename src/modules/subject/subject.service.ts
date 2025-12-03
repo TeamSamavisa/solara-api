@@ -18,6 +18,7 @@ export class SubjectService {
     const subjectData = {
       name: createSubjectDto.name,
       required_space_type_id: createSubjectDto.required_space_type_id,
+      course_id: createSubjectDto.course_id,
     };
 
     const subject = await this.subjectModel.create(subjectData);
@@ -32,7 +33,7 @@ export class SubjectService {
       limit,
       offset,
       order: [['name', 'ASC']],
-      include: ['requiredSpaceType'],
+      include: ['requiredSpaceType', 'course'],
       raw: true,
     });
 
@@ -56,7 +57,7 @@ export class SubjectService {
 
   async getById(id: number) {
     const subject = await this.subjectModel.findByPk(id, {
-      include: ['requiredSpaceType'],
+      include: ['requiredSpaceType', 'course'],
       raw: true,
     });
 
@@ -82,6 +83,11 @@ export class SubjectService {
     if (updateSubjectDto.required_space_type_id !== undefined) {
       updateData.required_space_type_id =
         updateSubjectDto.required_space_type_id;
+    }
+
+    if (updateSubjectDto.course_id !== undefined) {
+      updateData.course_id =
+        updateSubjectDto.course_id;
     }
 
     await subject.update(updateData);

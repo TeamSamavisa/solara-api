@@ -15,4 +15,11 @@ export class GetSubjectsQueryDto extends BaseQueryDto {
   @IsInt()
   @IsPositive()
   required_space_type_id?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  course_id?: number;
 }
