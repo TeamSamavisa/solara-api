@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, Matches } from 'class-validator';
+import { IsNotEmpty, IsString, Matches, IsInt } from 'class-validator';
 
 export class CreateScheduleDto {
   @ApiProperty()
@@ -20,4 +20,9 @@ export class CreateScheduleDto {
     message: 'End time must be in HH:MM format',
   })
   end_time: string;
+
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty({ message: 'Shift ID is required' })
+  shift_id: number;
 }

@@ -8,12 +8,14 @@ import {
   ForeignKey,
   PrimaryKey,
   AutoIncrement,
+  BelongsToMany,
 } from 'sequelize-typescript';
 import { ClassGroup } from 'src/modules/class-group/entities/class-group.entity';
 import { Schedule } from 'src/modules/schedule/entities/schedule.entity';
 import { Space } from 'src/modules/space/entities/space.entity';
 import { Subject } from 'src/modules/subject/entities/subject.entity';
 import { User } from 'src/modules/user/entities/user.entity';
+import { AssignmentSchedule } from './assignment-schedule.entity';
 
 @Table({ tableName: 'assignments' })
 export class Assignment extends Model {
@@ -22,11 +24,6 @@ export class Assignment extends Model {
   @AutoIncrement
   @Column(DataType.INTEGER)
   declare id: number;
-
-  @ApiProperty()
-  @ForeignKey(() => Schedule)
-  @Column(DataType.INTEGER)
-  schedule_id: number;
 
   @ApiProperty()
   @ForeignKey(() => User)
@@ -40,17 +37,25 @@ export class Assignment extends Model {
 
   @ApiProperty()
   @ForeignKey(() => Space)
-  @Column(DataType.INTEGER)
-  space_id: number;
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  space_id: number | null;
 
   @ApiProperty()
   @ForeignKey(() => ClassGroup)
   @Column(DataType.INTEGER)
   class_group_id: number;
 
-  @ApiProperty({ type: () => Schedule })
-  @BelongsTo(() => Schedule)
-  schedule: Schedule;
+  @ApiProperty({ default: 2 })
+  @Column({
+    type: DataType.INTEGER,
+    defaultValue: 2,
+    allowNull: false,
+  })
+  duration: number;
+
+  @ApiProperty({ type: () => [Schedule] })
+  @BelongsToMany(() => Schedule, () => AssignmentSchedule)
+  schedules: Schedule[];
 
   @ApiProperty({ type: () => User })
   @BelongsTo(() => User)

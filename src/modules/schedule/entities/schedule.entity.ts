@@ -5,11 +5,16 @@ import {
   Model,
   DataType,
   HasMany,
+  BelongsToMany,
+  BelongsTo,
+  ForeignKey,
   PrimaryKey,
   AutoIncrement,
 } from 'sequelize-typescript';
 import { Assignment } from 'src/modules/assignment/entities/assignment.entity';
+import { AssignmentSchedule } from 'src/modules/assignment/entities/assignment-schedule.entity';
 import { ScheduleTeacher } from 'src/modules/schedule-teacher/entities/schedule-teacher.entity';
+import { Shift } from 'src/modules/shift/entities/shift.entity';
 
 @Table({ tableName: 'schedules' })
 export class Schedule extends Model {
@@ -40,9 +45,20 @@ export class Schedule extends Model {
   })
   end_time: string;
 
+  @ApiProperty()
+  @ForeignKey(() => Shift)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  shift_id: number;
+
+  @BelongsTo(() => Shift)
+  shift: Shift;
+
   @HasMany(() => ScheduleTeacher)
   scheduleTeachers: ScheduleTeacher[];
 
-  @HasMany(() => Assignment)
+  @BelongsToMany(() => Assignment, () => AssignmentSchedule)
   assignments: Assignment[];
 }

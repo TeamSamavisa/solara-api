@@ -1,4 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, Logger } from '@nestjs/common';
+import {
+  ClassAllocationData,
+  ScheduleData,
+} from './interfaces/timetable-data.interface';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { Op } from 'sequelize';
@@ -13,6 +18,7 @@ import {
 
 // Import entities
 import { Assignment } from '../assignment/entities/assignment.entity';
+import { AssignmentSchedule } from '../assignment/entities/assignment-schedule.entity';
 import { Space } from '../space/entities/space.entity';
 import { SpaceType } from '../space-type/entities/space-type.entity';
 import { CourseType } from '../course-type/entities/course-type.entity';
@@ -38,6 +44,8 @@ export class TimetablingService {
   constructor(
     @InjectModel(Assignment)
     private readonly assignmentModel: typeof Assignment,
+    @InjectModel(AssignmentSchedule)
+    private readonly assignmentScheduleModel: typeof AssignmentSchedule,
     @InjectModel(Space)
     private readonly spaceModel: typeof Space,
     @InjectModel(SpaceType)
@@ -128,7 +136,7 @@ export class TimetablingService {
 
     // 8. Schedules
     const schedules = await this.scheduleModel.findAll({
-      attributes: ['id', 'weekday', 'start_time', 'end_time'],
+      attributes: ['id', 'weekday', 'start_time', 'end_time', 'shift_id'],
       order: [
         [
           this.sequelize.literal(`CASE weekday
@@ -162,36 +170,44 @@ export class TimetablingService {
       raw: true,
     });
 
-    // 10. Class Allocations (only non-optimized)
+    // 10. Class Allocations (with schedules if they exist)
     const classAllocationsRaw = await this.assignmentModel.findAll({
       attributes: [
         'id',
         'class_group_id',
         'subject_id',
         'teacher_id',
-        [this.sequelize.literal('2'), 'duration'], // Default duration: 2 hours
+        'space_id',
+        'duration',
       ],
-      where: {
-        [Op.or]: [{ schedule_id: null }, { space_id: null }],
-      },
+      include: [
+        {
+          model: this.scheduleModel,
+          as: 'schedules',
+          attributes: ['id', 'weekday', 'start_time', 'end_time', 'shift_id'],
+          through: { attributes: [] },
+          required: false,
+        },
+      ],
       order: [['id', 'ASC']],
-      raw: true,
     });
 
-    // Map to correct type with explicit duration
-    const classAllocations = classAllocationsRaw.map(
-      (allocation: {
-        id: number;
-        class_group_id: number;
-        subject_id: number;
-        teacher_id: number;
-      }) => ({
-        id: allocation.id,
-        class_group_id: allocation.class_group_id,
-        subject_id: allocation.subject_id,
-        teacher_id: allocation.teacher_id,
-        duration: 2, // Default duration
-      }),
+    const classAllocations: ClassAllocationData[] = classAllocationsRaw.map(
+      (alloc) => {
+        const allocPlain = alloc.get({ plain: true }) as Record<
+          string,
+          unknown
+        >;
+        return {
+          id: allocPlain.id as number,
+          class_group_id: allocPlain.class_group_id as number,
+          subject_id: allocPlain.subject_id as number,
+          teacher_id: allocPlain.teacher_id as number,
+          space_id: allocPlain.space_id as number | null,
+          duration: allocPlain.duration as number,
+          schedules: (allocPlain.schedules || []) as ScheduleData[],
+        };
+      },
     );
 
     // 11. Teacher Schedules (availability)
@@ -421,33 +437,37 @@ export class TimetablingService {
 
     try {
       for (const item of optimizedSchedule) {
-        // Find correct schedule based on first time_slot
-        if (item.time_slots && item.time_slots.length > 0) {
-          const firstSlot = item.time_slots[0];
-
-          // Find schedule matching day and time
-          const schedule = await this.scheduleModel.findOne({
-            where: {
-              weekday: firstSlot.day,
-              start_time: {
-                [Op.like]: `${String(firstSlot.hour).padStart(2, '0')}:%`,
-              },
+        // Update space/classroom
+        if (item.classroom && item.classroom.id) {
+          await this.assignmentModel.update(
+            {
+              space_id: item.classroom.id,
             },
+            {
+              where: { id: item.allocation_id },
+              transaction,
+            },
+          );
+        }
+
+        // Handle schedules - use schedule_ids directly from optimizer
+        const scheduleIds: number[] = item.schedule_ids || [];
+
+        if (scheduleIds.length > 0) {
+          // Remove existing schedule relations
+          await this.assignmentScheduleModel.destroy({
+            where: { assignment_id: item.allocation_id },
             transaction,
           });
 
-          if (schedule) {
-            await this.assignmentModel.update(
-              {
-                schedule_id: schedule.id,
-                space_id: item.classroom.id,
-              },
-              {
-                where: { id: item.allocation_id },
-                transaction,
-              },
-            );
-          }
+          // Create new schedule relations
+          const assignmentSchedules = scheduleIds.map((scheduleId) => ({
+            assignment_id: item.allocation_id,
+            schedule_id: scheduleId,
+          }));
+          await this.assignmentScheduleModel.bulkCreate(assignmentSchedules, {
+            transaction,
+          });
         }
       }
 

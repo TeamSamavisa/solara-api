@@ -62,7 +62,9 @@ export interface ClassAllocationData {
   class_group_id: number;
   subject_id: number;
   teacher_id: number;
+  space_id: number | null;
   duration: number;
+  schedules: ScheduleData[];
 }
 
 export interface TimetableInputData {
@@ -82,15 +84,18 @@ export interface TimetableInputData {
 export interface TimeSlot {
   day: string;
   hour: number;
+  schedule_id?: number;
 }
 
 export interface OptimizedAllocation {
   allocation_id: number;
+  schedule_ids?: number[]; // Direct schedule IDs from optimizer
   class_group: {
     id: number;
     name: string;
     course: string;
     shift: string;
+    shift_id?: number;
   };
   subject: {
     id: number;

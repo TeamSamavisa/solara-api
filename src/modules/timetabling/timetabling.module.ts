@@ -5,6 +5,7 @@ import { TimetablingController } from './timetabling.controller';
 
 // Import entities
 import { Assignment } from '../assignment/entities/assignment.entity';
+import { AssignmentSchedule } from '../assignment/entities/assignment-schedule.entity';
 import { Space } from '../space/entities/space.entity';
 import { SpaceType } from '../space-type/entities/space-type.entity';
 import { CourseType } from '../course-type/entities/course-type.entity';
@@ -26,6 +27,7 @@ import { TaskModule } from '../task/task.module';
   imports: [
     SequelizeModule.forFeature([
       Assignment,
+      AssignmentSchedule,
       Space,
       SpaceType,
       CourseType,
