@@ -54,6 +54,7 @@ export class AuthService {
       role: user.role,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password_hash, ...authenticatedUser } = user;
 
     return {

@@ -18,6 +18,7 @@ import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshAuthGuard } from './guards/refresh-jwt-auth.guard';
 import { NullableType } from 'src/utils/types/nullable-type';
+import { JwtPayloadType } from './strategies/types/jwt-payload.type';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -46,7 +47,9 @@ export class AuthController {
     type: User,
   })
   @HttpCode(HttpStatus.OK)
-  public me(@Request() request): Promise<NullableType<Partial<User>>> {
+  public me(
+    @Request() request: { user: JwtPayloadType },
+  ): Promise<NullableType<Partial<User>>> {
     return this.authService.me(request.user);
   }
 
@@ -60,7 +63,9 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(JwtRefreshAuthGuard)
   @HttpCode(HttpStatus.OK)
-  public refresh(@Request() req): Promise<RefreshResponseDto> {
+  public refresh(
+    @Request() req: { user: { id: number; role: string } },
+  ): Promise<RefreshResponseDto> {
     const payload = req.user;
     return this.authService.refreshToken(payload);
   }

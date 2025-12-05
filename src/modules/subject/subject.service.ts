@@ -86,8 +86,7 @@ export class SubjectService {
     }
 
     if (updateSubjectDto.course_id !== undefined) {
-      updateData.course_id =
-        updateSubjectDto.course_id;
+      updateData.course_id = updateSubjectDto.course_id;
     }
 
     await subject.update(updateData);

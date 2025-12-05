@@ -14,11 +14,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  public validate(payload: any): OrNeverType<any> {
+  public validate(payload: {
+    id?: number;
+    [key: string]: unknown;
+  }): OrNeverType<{ id: number; [key: string]: unknown }> {
     if (!payload.id) {
       throw new UnauthorizedException();
     }
 
-    return payload;
+    return payload as { id: number; [key: string]: unknown };
   }
 }
